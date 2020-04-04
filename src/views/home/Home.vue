@@ -3,7 +3,10 @@
     <nav-bar class="home-nav">
       <div slot="center">购物街</div>
     </nav-bar>
-    <scroll class="content">
+    <scroll class="content"
+            ref="scroll" :probe-type="3"
+            @scroll="contenScroll" :pull-up-load="true"
+            @pullingUp="loadMore">
       <home-swiper :banners="banners"></home-swiper>
       <home-recommend-view :recomends="recommends"></home-recommend-view>
       <feature-view></feature-view>
@@ -13,7 +16,7 @@
       ></tab-control>
       <goods-list :goods="showGoods"></goods-list>
     </scroll>
-    <back-top></back-top>
+    <back-top @click.native="backClick" v-show="isShowBackTop"></back-top>
   </div>
 </template>
 
@@ -42,6 +45,7 @@
           'sell':{page:0,list:[]},
         },
         currentType:"pop",
+        isShowBackTop:false
       }
     },
     components:{
@@ -77,6 +81,15 @@
             break
         }
       },
+      backClick(){
+        this.$refs.scroll.scrollTo(0,0)
+      },
+      contenScroll(val){
+        this.isShowBackTop = val.y < -1000
+      },
+      loadMore(){
+        this.getHomeGoods(this.currentType)
+      },
       // 网络请求相关的方法
       getHomeMultidata(){
         getHomeMultidata().then(res=>{
@@ -89,6 +102,8 @@
         const page = this.goods[type].page+1
         getHomeGoods(type,page).then(res=>{
           this.goods[type].list.push(...res.data.list)
+          this.goods[type].page += 1;
+          this.$refs.scroll.finishPullUp()
         })
       }
     },
@@ -121,7 +136,7 @@
     z-index: 9;
   }
   .content {
-    height: calc(100%-93px);
+    height: calc(100% - 93px);
     overflow: hidden;
     position: absolute;
     top: 44px;

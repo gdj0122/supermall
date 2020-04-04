@@ -12,7 +12,8 @@ npm run serve
 
 ### Compiles and minifies for production
 ```
-有问题可以加QQ:1035549127
+有问题可以加QQ:1035549128
+需要接口加wx:coderwhy001
 npm run build
 ```
 
