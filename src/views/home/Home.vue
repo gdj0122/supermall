@@ -13,6 +13,7 @@
       ></tab-control>
       <goods-list :goods="showGoods"></goods-list>
     </scroll>
+    <back-top></back-top>
   </div>
 </template>
 
@@ -25,6 +26,7 @@
   import TabControl from "@/components/content/tabControl/TabControl";
   import GoodsList from "@/components/content/goods/GoodsList";
   import Scroll from "@/components/common/scroll/Scroll";
+  import backTop from "components/content/backTop/backTop";
 
   import {getHomeMultidata,getHomeGoods} from "@/network/home";
 
@@ -50,6 +52,7 @@
       TabControl,
       GoodsList,
       Scroll,
+      backTop
     },
     created() {
       // 请求多个数据
@@ -99,7 +102,7 @@
 
 <style scoped>
   #home{
-    /*padding-top: 44px;*/
+    padding-top: 44px;
     height: 100vh;
     position: relative;
   }
@@ -122,7 +125,7 @@
     overflow: hidden;
     position: absolute;
     top: 44px;
-    bottom: 49px;
+    bottom: 66px;
     left: 0;
     right: 0;
   }
