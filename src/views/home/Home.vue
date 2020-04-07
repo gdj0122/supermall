@@ -6,6 +6,7 @@
     <scroll class="content"
             ref="scroll" :probe-type="3"
             @scroll="contenScroll" :pull-up-load="true"
+            @pullingUp="loadMore"
             >
       <home-swiper :banners="banners"></home-swiper>
       <home-recommend-view :recomends="recommends"></home-recommend-view>
@@ -97,7 +98,10 @@
       contenScroll(val){
         this.isShowBackTop = val.y < -1000
       },
-
+      // 下拉加载更多
+      loadMore(){
+        this.getHomeGoods(this.currentType)
+      },
       // 网络请求相关的方法
       getHomeMultidata(){
         getHomeMultidata().then(res=>{
@@ -110,6 +114,8 @@
         getHomeGoods(type,page).then(res=>{
           this.goods[type].list.push(...res.data.list)
           this.goods[type].page += 1;
+          // 完成加载更多
+          this.$refs.scroll.finishPullUp()
         })
       }
     },
