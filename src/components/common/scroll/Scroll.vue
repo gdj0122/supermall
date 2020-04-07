@@ -24,24 +24,27 @@
       }
     },
     mounted() {
+      // 创建BScroll对象
       this.scroll = new BScroll(this.$refs.wrapper,{
         click: true,
-        probeType: this.probeType,
-        pullUpLoad: this.pullUpLoad
+        probeType: this.probeType,//判断滚动
+        pullUpLoad: this.pullUpLoad//监听上拉加载
       })
+      // 监听滚动的位置
       this.scroll.on('scroll',(position)=>{
         this.$emit("scroll",position)
       })
-      this.scroll.on('pullingUp',()=>{
-        this.$emit("pullingUp")
-      })
+      console.log(this.scroll)
     },
     methods:{
       scrollTo(x,y,time=300){
-        this.scroll.scrollTo(x,y,time)
+        this.scroll &&this.scroll.scrollTo(x,y,time)
       },
-      finishPullUp(){
-        this.scroll.finishPullUp()
+      // finishPullUp(){
+      //   this.scroll.finishPullUp()
+      // },
+      refresh(){
+        this.scroll &&this.scroll.refresh()
       }
     }
   }

@@ -6,7 +6,7 @@
     <scroll class="content"
             ref="scroll" :probe-type="3"
             @scroll="contenScroll" :pull-up-load="true"
-            @pullingUp="loadMore">
+            >
       <home-swiper :banners="banners"></home-swiper>
       <home-recommend-view :recomends="recommends"></home-recommend-view>
       <feature-view></feature-view>
@@ -32,6 +32,7 @@
   import backTop from "components/content/backTop/backTop";
 
   import {getHomeMultidata,getHomeGoods} from "@/network/home";
+  import {debounce} from "common/utils";
 
   export default {
     name: "Home",
@@ -65,8 +66,17 @@
       this.getHomeGoods("pop")
       this.getHomeGoods("new")
       this.getHomeGoods("sell")
+      // 3.监听item中图片加载完成
+
+    },
+    mounted(){
+      let refresh = debounce(this.$refs.scroll.refresh,50)
+      this.$bus.$on('itemImageLoad',()=>{
+        refresh
+      })
     },
     methods:{
+      // 刷新频繁防抖函数处理
       // 事件监听相关的方法
       tabClick(index){
         switch (index) {
@@ -87,15 +97,12 @@
       contenScroll(val){
         this.isShowBackTop = val.y < -1000
       },
-      loadMore(){
-        this.getHomeGoods(this.currentType)
-      },
+
       // 网络请求相关的方法
       getHomeMultidata(){
         getHomeMultidata().then(res=>{
           this.banners = res.data.banner.list
           this.recommends = res.data.recommend.list
-          console.log(res)
         })
       },
       getHomeGoods(type){
@@ -103,7 +110,6 @@
         getHomeGoods(type,page).then(res=>{
           this.goods[type].list.push(...res.data.list)
           this.goods[type].page += 1;
-          this.$refs.scroll.finishPullUp()
         })
       }
     },
