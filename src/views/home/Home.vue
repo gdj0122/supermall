@@ -3,17 +3,23 @@
     <nav-bar class="home-nav">
       <div slot="center">购物街</div>
     </nav-bar>
+    <tab-control class="tab-control"
+                 :titles="['流行','新款','精选']"
+                 @tabClick="tabClick"
+                 ref="TabControl1" v-show="isTabFixed"
+    ></tab-control>
     <scroll class="content"
             ref="scroll" :probe-type="3"
             @scroll="contenScroll" :pull-up-load="true"
             @pullingUp="loadMore"
             >
-      <home-swiper :banners="banners"></home-swiper>
+      <home-swiper :banners="banners" @swiperImageLoad="swiperImageLoad">
+      </home-swiper>
       <home-recommend-view :recomends="recommends"></home-recommend-view>
       <feature-view></feature-view>
-      <tab-control class="tab-control"
-                   :titles="['流行','新款','精选']"
+      <tab-control :titles="['流行','新款','精选']"
                    @tabClick="tabClick"
+                   ref="TabControl2"
       ></tab-control>
       <goods-list :goods="showGoods"></goods-list>
     </scroll>
@@ -47,7 +53,10 @@
           'sell':{page:0,list:[]},
         },
         currentType:"pop",
-        isShowBackTop:false
+        isShowBackTop:false,
+        taboffsetTop:0,
+        isTabFixed:false,
+        saveY:0
       }
     },
     components:{
@@ -67,14 +76,21 @@
       this.getHomeGoods("pop")
       this.getHomeGoods("new")
       this.getHomeGoods("sell")
-      // 3.监听item中图片加载完成
-
     },
     mounted(){
+      // 图片加载完成的事件监听
       let refresh = debounce(this.$refs.scroll.refresh,50)
       this.$bus.$on('itemImageLoad',()=>{
         refresh
       })
+
+    },
+    activated(){
+      this.$refs.scroll.scrollTo(0,this.saveY,0)
+      this.$refs.scroll.refresh()
+    },
+    deactivated(){
+      this.saveY = this.$refs.scroll.getScrollY()
     },
     methods:{
       // 刷新频繁防抖函数处理
@@ -91,12 +107,22 @@
             this.currentType="sell"
             break
         }
+        this.$refs.TabControl1.currentIndex = index;
+        this.$refs.TabControl2.currentIndex = index;
       },
       backClick(){
         this.$refs.scroll.scrollTo(0,0)
       },
-      contenScroll(val){
-        this.isShowBackTop = val.y < -1000
+      contenScroll(position){
+        // 1.判断backTop是否显示
+        this.isShowBackTop = position.y < -1000
+        // 2.决定tabcontrol是否吸顶
+        this.isTabFixed = position.y < -this.taboffsetTop
+      },
+      // 获取TabControl的offsetTop
+      // 所有组件都有一个属性$el:用于获取组件中的元素
+      swiperImageLoad(){
+        this.taboffsetTop = this.$refs.TabControl2.$el.offsetTop
       },
       // 下拉加载更多
       loadMore(){
@@ -129,23 +155,22 @@
 
 <style scoped>
   #home{
-    padding-top: 44px;
+    /*padding-top: 44px;*/
     height: 100vh;
     position: relative;
   }
   .home-nav{
     background-color: var(--color-tint);
     color: #fff;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
+    /*position: fixed;*/
+    /*top: 0;*/
+    /*left: 0;*/
+    /*right: 0;*/
     z-index: 2;
   }
   .tab-control{
-    position: sticky;
-    top: 44px;
-    z-index: 9;
+    position: relative;
+    z-index: 6;
   }
   .content {
     height: calc(100% - 93px);

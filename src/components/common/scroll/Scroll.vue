@@ -31,9 +31,9 @@
         pullUpLoad: this.pullUpLoad//监听上拉加载
       })
       // 监听滚动的位置
-      if (this.probeType===2&&this.probeType===3){
-        this.scroll.on('scroll',(position)=>{
-          this.$emit("scroll",position)
+      if (this.probeType === 2 || this.probeType === 3) {
+        this.scroll.on('scroll', (position) => {
+          this.$emit('scroll', position)
         })
       }
       // 监听scroll滚到底部
@@ -52,6 +52,9 @@
       },
       refresh(){
         this.scroll &&this.scroll.refresh()
+      },
+      getScrollY(){
+        return this.scroll ? this.scroll.y : 0
       }
     }
   }
