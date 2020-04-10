@@ -40,6 +40,7 @@
 
   import {getHomeMultidata,getHomeGoods} from "@/network/home";
   import {debounce} from "common/utils";
+  import {itemListenerMixin} from "common/mixin";
 
   export default {
     name: "Home",
@@ -56,7 +57,8 @@
         isShowBackTop:false,
         taboffsetTop:0,
         isTabFixed:false,
-        saveY:0
+        saveY:0,
+        itemImgLiner:null
       }
     },
     components:{
@@ -77,20 +79,15 @@
       this.getHomeGoods("new")
       this.getHomeGoods("sell")
     },
-    mounted(){
-      // 图片加载完成的事件监听
-      let refresh = debounce(this.$refs.scroll.refresh,50)
-      this.$bus.$on('itemImageLoad',()=>{
-        refresh
-      })
-
-    },
     activated(){
       this.$refs.scroll.scrollTo(0,this.saveY,0)
       this.$refs.scroll.refresh()
     },
     deactivated(){
+      // 保存y值
       this.saveY = this.$refs.scroll.getScrollY()
+      // 取消全局事件的监听
+      this.$bus.$off('homeItemImageLoad',this.itemImgLiner)
     },
     methods:{
       // 刷新频繁防抖函数处理
