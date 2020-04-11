@@ -40,7 +40,7 @@
 
   import {getHomeMultidata,getHomeGoods} from "@/network/home";
   import {debounce} from "common/utils";
-  import {itemListenerMixin} from "common/mixin";
+  import {itemListenerMixin,backTopMixin} from "common/mixin";
 
   export default {
     name: "Home",
@@ -54,7 +54,6 @@
           'sell':{page:0,list:[]},
         },
         currentType:"pop",
-        isShowBackTop:false,
         taboffsetTop:0,
         isTabFixed:false,
         saveY:0,
@@ -69,8 +68,8 @@
       TabControl,
       GoodsList,
       Scroll,
-      backTop
     },
+    mixins:[itemListenerMixin,backTopMixin],
     created() {
       // 请求多个数据
       this.getHomeMultidata()
@@ -87,7 +86,7 @@
       // 保存y值
       this.saveY = this.$refs.scroll.getScrollY()
       // 取消全局事件的监听
-      this.$bus.$off('homeItemImageLoad',this.itemImgLiner)
+      this.$bus.$off('itemImageLoad',this.itemImgLiner)
     },
     methods:{
       // 刷新频繁防抖函数处理
@@ -107,12 +106,9 @@
         this.$refs.TabControl1.currentIndex = index;
         this.$refs.TabControl2.currentIndex = index;
       },
-      backClick(){
-        this.$refs.scroll.scrollTo(0,0)
-      },
       contenScroll(position){
         // 1.判断backTop是否显示
-        this.isShowBackTop = position.y < -1000
+        this.listenShowBackTop(position)
         // 2.决定tabcontrol是否吸顶
         this.isTabFixed = position.y < -this.taboffsetTop
       },
