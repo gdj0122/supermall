@@ -40,22 +40,14 @@
 
   import {getHomeMultidata,getHomeGoods} from "@/network/home";
   import {debounce} from "common/utils";
-  import {itemListenerMixin,backTopMixin} from "common/mixin";
-
+  import {itemListenerMixin,backTopMixin,tabclickMixin} from "common/mixin";
   export default {
     name: "Home",
     data(){
       return{
         banners:[],
         recommends:[],
-        goods:{
-          'pop':{page:0,list:[]},
-          'new':{page:0,list:[]},
-          'sell':{page:0,list:[]},
-        },
-        currentType:"pop",
         taboffsetTop:0,
-        isTabFixed:false,
         saveY:0,
         itemImgLiner:null
       }
@@ -69,14 +61,12 @@
       GoodsList,
       Scroll,
     },
-    mixins:[itemListenerMixin,backTopMixin],
+    mixins:[itemListenerMixin,backTopMixin,tabclickMixin],
     created() {
       // 请求多个数据
       this.getHomeMultidata()
       // 请求商品数据
-      this.getHomeGoods("pop")
-      this.getHomeGoods("new")
-      this.getHomeGoods("sell")
+
     },
     activated(){
       this.$refs.scroll.scrollTo(0,this.saveY,0)
@@ -91,21 +81,7 @@
     methods:{
       // 刷新频繁防抖函数处理
       // 事件监听相关的方法
-      tabClick(index){
-        switch (index) {
-          case 0:
-            this.currentType="pop"
-            break
-          case  1:
-            this.currentType="new"
-            break
-          case 2:
-            this.currentType="sell"
-            break
-        }
-        this.$refs.TabControl1.currentIndex = index;
-        this.$refs.TabControl2.currentIndex = index;
-      },
+
       contenScroll(position){
         // 1.判断backTop是否显示
         this.listenShowBackTop(position)
@@ -128,20 +104,6 @@
           this.recommends = res.data.recommend.list
         })
       },
-      getHomeGoods(type){
-        const page = this.goods[type].page+1
-        getHomeGoods(type,page).then(res=>{
-          this.goods[type].list.push(...res.data.list)
-          this.goods[type].page += 1;
-          // 完成加载更多
-          this.$refs.scroll.finishPullUp()
-        })
-      }
-    },
-    computed:{
-      showGoods(){
-        return this.goods[this.currentType].list
-      }
     }
   }
 </script>

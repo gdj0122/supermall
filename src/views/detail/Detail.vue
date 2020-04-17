@@ -33,6 +33,7 @@
   import {getDetail,getRecommend,Goods,Shop,GoodsParam} from "network/detail";
   import {debounce} from "common/utils";
   import {itemListenerMixin,backTopMixin} from "common/mixin";
+  import { mapActions } from 'vuex'
 
   export default {
     name: "Detail",
@@ -93,6 +94,7 @@
       this.$bus.$off('itemImageLoad',this.itemImgLiner)
     },
     methods:{
+      ...mapActions(['addCart']),
       imageLoad(){
         this.newRefresh
         // this.$refs.scroll.refresh()
@@ -127,7 +129,9 @@
         product.price = this.goods.realPrice
         product.iid = this.iid
         // 添加到购物车里
-        this.$store.dispatch("addCart",product)
+        this.addCart(product).then(res=>{
+          this.$toast.show(res)
+        })
       }
     }
   }

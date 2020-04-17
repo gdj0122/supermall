@@ -22,6 +22,7 @@
  .check-button{
    border-radius: 50%;
    border: 2px solid #ff5777;
+   background: #fff;
  }
   .active{
     background: #ff5777;

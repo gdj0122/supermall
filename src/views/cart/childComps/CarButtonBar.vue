@@ -1,13 +1,13 @@
 <template>
   <div class="botton-bar">
     <div class="check-content">
-      <check-button class="check-button"></check-button>
+      <check-button :is-checked="isSelectAll" class="check-button" @click.native="checkClick"></check-button>
       <span>全选</span>
     </div>
     <div class="price">
       合计: {{totalPrice}}
     </div>
-    <div class="calculate">
+    <div class="calculate" @click="calcClick">
       去计算: ({{checkLength}})
     </div>
   </div>
@@ -15,21 +15,38 @@
 
 <script>
   import CheckButton from "components/content/checkButton/CheckButton";
+  import {mapGetters} from 'vuex'
   export default {
     name: "CarButtonBar",
     components:{
       CheckButton
     },
     computed:{
+      ...mapGetters(['CartLength','CartList']),
       totalPrice(){
-        return "￥" + this.$store.state.cartList.filter(item=>{
+        return "￥" + this.CartList.filter(item=>{
           return item.checked
         }).reduce((preValue,item)=>{
           return preValue + item.price * item.count
         },0).toFixed(2)
       },
       checkLength(){
-        return this.$store.state.cartList.filter(item=> item.checked).length
+        return this.CartList.filter(item=> item.checked).length
+      },
+      isSelectAll(){
+        if (this.CartList.length === 0) return false
+        return !this.CartList.find(item => !item.checked)
+      }
+    },
+    methods:{
+      checkClick(){
+        this.isSelectAll ? this.CartList.forEach(item=>item.checked =false)
+          :this.CartList.forEach(item=>item.checked = true)
+      },
+      calcClick(){
+        if (!this.isSelectAll) {
+          this.$toast.show("请添加商品",2000)
+        }
       }
     }
   }
